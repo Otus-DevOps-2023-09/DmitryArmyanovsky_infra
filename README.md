@@ -52,3 +52,68 @@ testapp_port = 9292
 Установлено и запущено тестовое приложение.
 
 Команды по настройке системы и деплоя приложения описаны в виде bash скриптов.
+
+
+#############################################################################################################
+# HW 5. Packer Base
+
+# Установка Packer (нужно включить vpn)
+
+wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt update && sudo apt install packer
+
+
+# Создание сервисного аккаунта для Packer в Yandex.Cloud
+
+yc config list
+SVC_ACCT=packer-svc
+FOLDER_ID=xxxxxxxxxx5hl8r7vt5p
+yc iam service-account create --name $SVC_ACCT --folder-id $FOLDER_ID
+
+
+# Делегирование прав сервисному аккаунту для Packer
+
+ACCT_ID=$(yc iam service-account get packer-svc | grep ^id | awk '{print $2}')
+yc resource-manager folder add-access-binding --id $FOLDER_ID --role editor --service-account-id $ACCT_ID
+
+
+# Создание service account key file
+
+yc iam key create --service-account-id $ACCT_ID --output /home/user/key.json
+
+
+# Установка плагина Yandex Compute Builder
+
+Создайте файл config.pkr.hcl со следующим содержанием:
+packer {
+  required_plugins {
+    yandex = {
+      version = ">= 1.1.2"
+      source  = "github.com/hashicorp/yandex"
+    }
+  }
+}
+
+Установите плагин:
+packer init <путь_к_файлу_config.pkr.hcl>
+
+
+# Проверка на ошибки
+
+packer validate ./ubuntu16.json
+
+
+# Запуск сборки образа
+
+packer build ./ubuntu16.json
+
+
+# После создания ВМ из нового образа зайти на нее:
+
+ssh -i ~/.ssh/<ssh_key> appuser@<публичный IP машины>
+
+
+# Сборка образа с переменными, вынесенными в файл variables.json
+
+packer build -var-file=./variables.json ./ubuntu16.json
