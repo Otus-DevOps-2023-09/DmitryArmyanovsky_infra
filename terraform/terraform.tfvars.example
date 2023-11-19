@@ -1,0 +1,8 @@
+cloud_id                 = "b1gecxxiucjp"
+folder_id                = "b1g7x7vt5p"
+zone                     = "ru-central1-a"
+image_id                 = "fdxxxsm4qd9v"
+public_key_path          = "terraform.pub"
+private_key_path         = "terraform"
+subnet_id                = "e9be2xxxxxxx4d5pm7o2j1"
+service_account_key_file = "/home/user/key.json"
