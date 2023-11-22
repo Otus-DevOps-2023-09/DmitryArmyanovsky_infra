@@ -117,3 +117,18 @@ ssh -i ~/.ssh/<ssh_key> appuser@<публичный IP машины>
 # Сборка образа с переменными, вынесенными в файл variables.json
 
 packer build -var-file=./variables.json ./ubuntu16.json
+
+
+#############################################################################################################
+# HW 5. Terraform-1
+
+# Установка Terraform (нужно включить vpn)
+
+wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt update && sudo apt install terraform
+
+# Созданы конфигурационные файлы terraform
+# Создан файл outputs.tf для определения значения необходимых переменных после работы terraform
+# Определены provisioners в main.tf для выполнения команд на удаленной ВМ
+# Входные переменные вынесены в отдельный файл
