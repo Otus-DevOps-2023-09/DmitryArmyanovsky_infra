@@ -143,3 +143,37 @@ sudo apt update && sudo apt install terraform
 # Создан бакет в Yandex Object Storage
 # Описание бекенда вынесено в отдельный файл backend.tf
 # Настроено сохранение state файла в бакете
+
+
+#############################################################################################################
+# HW 8. Управление конфигурацией. Знакомство с Ansible
+
+# Установлен Ansible
+pip install ansible
+
+# Развернута инфраструктура stage в яндекс облаке
+# Созданы файлы inventory и ansible.cfg с описанием ВМ
+# Проверено ssh соединение с ВМ
+ansible all -m ping
+appserver | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
+}
+dbserver | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
+
+# Проверено выполнение удаленных команд на ВМ с использованием модулей "command", "git", "service", "shell"
+ansible app -m command -a 'ruby -v'
+ansible app -m shell -a 'ruby -v; bundler -v'
+ansible app -m git -a 'repo=https://github.com/express42/reddit.git dest=/home/appuser/reddit'
+ansible db -m systemd -a name=mongod
+ansible db -m service -a name=mongod
+
+# Написан простой плейбук clone.yml
